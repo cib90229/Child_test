@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>分數披薩屋・二年級</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FFF3EA; --bg2:#FCE8DA;
+    --panel:#FFFFFF;
+    --ink:#3E2A32; --ink-soft:#8A6E76;
+    --shade:#FF7B9C; --shade-deep:#E85C82;
+    --crust:#E3A35C; --crust-d:#C9863F;
+    --leaf:#4FB48C; --leaf-deep:#349873;
+    --grape:#7E73C9;
+    --line:#EBD8CB;
+    --shadow:0 10px 28px rgba(62,42,50,.14);
+    --shadow-sm:0 4px 12px rgba(62,42,50,.12);
+    --num:"Baloo 2","PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;
+    --body:"Nunito","PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{font-family:var(--body);
+    background:radial-gradient(1100px 560px at 50% -8%, var(--bg) 0%, var(--bg2) 72%) fixed;
+    color:var(--ink); min-height:100vh; padding:16px 14px 56px; display:flex; justify-content:center}
+  .wrap{width:100%; max-width:580px}
+
+  header{display:flex; align-items:center; gap:12px; margin-bottom:12px}
+  .logo{font-size:38px; line-height:1; filter:drop-shadow(0 3px 4px rgba(0,0,0,.12))}
+  .titles h1{font-family:var(--num); font-weight:800; font-size:25px; margin:0; letter-spacing:.5px}
+  .titles p{margin:2px 0 0; color:var(--ink-soft); font-weight:700; font-size:13px}
+
+  /* progress + score */
+  .topbar{display:flex; align-items:center; gap:10px; margin-bottom:14px}
+  .prog{flex:1; background:#fff; border-radius:14px; padding:8px 12px; box-shadow:var(--shadow-sm)}
+  .prog .lab{font-family:var(--num); font-weight:700; font-size:13px; color:var(--ink-soft); display:flex; justify-content:space-between}
+  .prog .lab b{color:var(--ink); font-size:15px}
+  .bar{height:8px; background:#F0E0D6; border-radius:99px; margin-top:5px; overflow:hidden}
+  .bar i{display:block; height:100%; width:0; background:linear-gradient(90deg,var(--shade),var(--grape)); border-radius:99px; transition:width .3s}
+  .scorechip{background:#fff; border-radius:14px; padding:8px 14px; box-shadow:var(--shadow-sm); font-weight:800; font-size:14px; white-space:nowrap}
+  .scorechip b{font-family:var(--num); font-size:20px; color:var(--leaf-deep)}
+
+  .card{background:var(--panel); border-radius:26px; box-shadow:var(--shadow); padding:20px 18px; position:relative}
+  .badge{display:inline-block; font-family:var(--num); font-weight:700; font-size:12.5px;
+    padding:5px 13px; border-radius:999px; color:#fff; margin-bottom:11px; background:var(--grape)}
+  .q{font-family:var(--num); font-weight:700; font-size:21px; line-height:1.5; margin:0 0 14px}
+  .q b{color:var(--shade-deep)}
+
+  .stage{display:flex; gap:18px; justify-content:center; align-items:center; flex-wrap:wrap;
+    background:linear-gradient(180deg,#FFFBF8,#FDF2EA); border:2px solid #F4E0D2;
+    border-radius:20px; padding:18px 14px; margin-bottom:4px}
+  .stage .cap{font-family:var(--num); font-weight:700; font-size:14px; color:var(--ink-soft); text-align:center; margin-top:7px}
+  .stageitem{display:flex; flex-direction:column; align-items:center}
+  .shape{display:block; width:100%; height:auto}
+  .barwrap{width:300px; max-width:100%} .piewrap{width:160px; max-width:46vw}
+  .stage.scene{font-size:52px; padding:22px 14px}
+
+  /* interactive shade cells */
+  .cells{display:flex; width:300px; max-width:100%; height:84px; border:4px solid var(--ink);
+    border-radius:10px; overflow:hidden; margin:0 auto}
+  .cell{flex:1; border-right:3px solid var(--crust); background:#fff; cursor:pointer; transition:background .12s}
+  .cell:last-child{border-right:none}
+  .cell.on{background:var(--shade)}
+  .cell:active{transform:none}
+
+  /* fraction glyph */
+  .frac{display:inline-flex; flex-direction:column; align-items:center; line-height:1;
+    vertical-align:middle; font-family:var(--num); font-weight:800}
+  .frac .fn,.frac .fd{font-size:1em} .frac .fbar{width:1.5em; height:3px; background:currentColor; margin:3px 0; border-radius:2px}
+  .bigfrac{font-size:46px; color:var(--shade-deep)}
+
+  .thinkbtn{margin-top:14px; width:100%; border:none; cursor:pointer; font-family:var(--num);
+    font-weight:700; font-size:17px; padding:12px; border-radius:15px; background:#FFE8D6;
+    color:var(--crust-d); box-shadow:var(--shadow-sm); transition:transform .12s}
+  .thinkbtn:active{transform:scale(.98)}
+  .thinkbtn.nudge{animation:nudge .5s ease 2}
+  @keyframes nudge{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+
+  .think{margin-top:12px; background:#FFF6EE; border:2px solid #F6DCC6; border-radius:18px; padding:6px 14px 12px; display:none}
+  .think.show{display:block; animation:fade .3s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  .step{font-family:var(--num); font-weight:600; font-size:16.5px; line-height:1.6; padding:9px 2px;
+    border-bottom:1px dashed #F0D6C0; display:none}
+  .step:last-child{border-bottom:none}
+  .step.on{display:block; animation:fade .3s ease}
+  .step .h{color:var(--crust-d); font-weight:800}
+  .step .hl{background:#FFE0B8; border-radius:8px; padding:1px 8px; font-weight:800; color:#8a5a16}
+  .step .pk{color:var(--shade-deep); font-weight:800}
+  .nextstep{margin-top:8px}
+  .nextstep button{width:100%; border:none; cursor:pointer; font-family:var(--num); font-weight:700;
+    font-size:15px; padding:9px; border-radius:12px; background:var(--crust); color:#fff}
+  .nextstep button:disabled{opacity:.45}
+
+  .opts{display:grid; grid-template-columns:1fr 1fr; gap:11px; margin-top:16px}
+  .opt{border:none; cursor:pointer; background:#fff; border-radius:18px; padding:15px 12px;
+    box-shadow:var(--shadow-sm); font-family:var(--num); font-weight:800; font-size:20px;
+    min-height:64px; display:flex; align-items:center; justify-content:center; color:var(--ink);
+    transition:transform .1s}
+  .opt:active{transform:scale(.96)}
+  .opt.shapeopt{padding:10px}
+  .opt.correct{background:var(--leaf); color:#fff; box-shadow:0 0 0 3px rgba(79,180,140,.3)}
+  .opt.wrong{background:var(--shade); color:#fff}
+  .opt:disabled{cursor:default}
+  .opt .frac{color:inherit}
+
+  .makeacts{display:flex; gap:10px; margin-top:14px}
+  .makeacts button{flex:1; border:none; cursor:pointer; font-family:var(--num); font-weight:700;
+    font-size:17px; padding:13px; border-radius:16px; transition:transform .1s}
+  .makeacts button:active{transform:scale(.97)}
+  .clr{background:#F1E4DA; color:var(--ink-soft)} .done{background:var(--leaf); color:#fff}
+
+  .fb{margin-top:14px; border-radius:18px; padding:13px; text-align:center; font-family:var(--num);
+    font-weight:800; font-size:18px; display:none; align-items:center; justify-content:center; gap:9px}
+  .fb.show{display:flex; animation:fade .3s ease}
+  .fb.good{background:#DDF4EB; color:var(--leaf-deep)}
+  .fb.bad{background:#FFE6EC; color:var(--shade-deep)}
+  .fb .em{font-size:26px}
+  .nextq{margin-top:12px; width:100%; border:none; cursor:pointer; font-family:var(--num);
+    font-weight:800; font-size:19px; padding:15px; border-radius:18px; background:var(--grape);
+    color:#fff; box-shadow:var(--shadow-sm); display:none}
+  .nextq.show{display:block} .nextq:active{transform:scale(.98)}
+
+  /* results */
+  .result{text-align:center; padding:14px 8px}
+  .result .em{font-size:64px}
+  .result h2{font-family:var(--num); font-weight:800; font-size:26px; margin:8px 0 4px}
+  .result .big{font-family:var(--num); font-weight:800; font-size:56px; color:var(--leaf-deep); line-height:1.1}
+  .result .big span{font-size:26px; color:var(--ink-soft)}
+  .result p{color:var(--ink-soft); font-weight:700; font-size:16px; margin:10px 0 18px}
+  .result button{border:none; cursor:pointer; font-family:var(--num); font-weight:800; font-size:19px;
+    padding:14px 30px; border-radius:18px; background:var(--shade); color:#fff; box-shadow:var(--shadow-sm)}
+
+  footer{text-align:center; color:var(--ink-soft); font-weight:700; font-size:12px; margin-top:20px; opacity:.7}
+
+  @media (max-width:380px){ .q{font-size:19px} .opt{font-size:18px} .barwrap,.cells{width:100%} }
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  :focus-visible{outline:3px solid var(--grape); outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">🍕</div>
+    <div class="titles">
+      <h1>分數披薩屋</h1>
+      <p>先平分，再看分母分子 — 二年級分數觀念練習</p>
+    </div>
+  </header>
+
+  <div class="topbar">
+    <div class="prog">
+      <div class="lab"><span>進度</span><span>第 <b id="cur">1</b> / 100 題</span></div>
+      <div class="bar"><i id="fill"></i></div>
+    </div>
+    <div class="scorechip">⭐ <b id="score">0</b></div>
+  </div>
+
+  <div class="card" id="card">
+    <span class="badge" id="badge">題型</span>
+    <p class="q" id="question">準備中…</p>
+    <div id="stage"></div>
+    <button class="thinkbtn" id="thinkBtn">想一想 🤔（這題在教什麼）</button>
+    <div class="think" id="think"></div>
+    <div id="answer"></div>
+    <div class="fb" id="fb"></div>
+    <button class="nextq" id="nextQ">下一題 ▸</button>
+  </div>
+
+  <footer>共 100 題，含 8 種題型 — 每題都會帶你想一想 🍰</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  const $=s=>document.querySelector(s);
+  const rnd=n=>Math.floor(Math.random()*n);
+  const pick=a=>a[rnd(a.length)];
+  const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]];}return a;};
+  const CN=['零','一','二','三','四','五','六','七','八','九','十'];
+  const cn=n=>CN[n]||n;
+
+  // ---------- fraction glyph ----------
+  function frac(m,n){return `<span class="frac"><span class="fn">${m}</span><span class="fbar"></span><span class="fd">${n}</span></span>`;}
+
+  // ---------- SVG shapes ----------
+  function bar(n, shaded, equal){
+    const W=300,H=84; let cells='';
+    if(equal){
+      const pw=W/n;
+      for(let i=0;i<n;i++){
+        const on = Array.isArray(shaded)?shaded.includes(i):i<shaded;
+        cells+=`<rect x="${(i*pw).toFixed(1)}" y="0" width="${pw.toFixed(1)}" height="${H}" fill="${on?'var(--shade)':'#fff'}" stroke="var(--crust)" stroke-width="3"/>`;
+      }
+    } else {
+      // unequal widths
+      let w=[],sum=0;
+      do{ w=[];sum=0; for(let i=0;i<n;i++){const r=1+Math.random()*3.2;w.push(r);sum+=r;} }
+      while(Math.max(...w)/Math.min(...w)<1.7);
+      let x=0;
+      for(let i=0;i<n;i++){const pw=w[i]/sum*W;
+        cells+=`<rect x="${x.toFixed(1)}" y="0" width="${pw.toFixed(1)}" height="${H}" fill="#fff" stroke="var(--crust)" stroke-width="3"/>`; x+=pw;}
+    }
+    return `<svg viewBox="0 0 ${W} ${H}" class="shape">${cells}<rect x="1.5" y="1.5" width="${W-3}" height="${H-3}" fill="none" stroke="var(--ink)" stroke-width="4" rx="7"/></svg>`;
+  }
+  function sector(cx,cy,r,a1,a2,fill){
+    const rad=d=>d*Math.PI/180;
+    const x1=(cx+r*Math.cos(rad(a1))).toFixed(2), y1=(cy+r*Math.sin(rad(a1))).toFixed(2);
+    const x2=(cx+r*Math.cos(rad(a2))).toFixed(2), y2=(cy+r*Math.sin(rad(a2))).toFixed(2);
+    const large=(a2-a1)>180?1:0;
+    return `<path d="M${cx} ${cy} L${x1} ${y1} A${r} ${r} 0 ${large} 1 ${x2} ${y2} Z" fill="${fill}" stroke="var(--ink)" stroke-width="3"/>`;
+  }
+  function pie(n, shaded, equal){
+    const cx=85,cy=85,r=78; let ang=[];
+    if(equal){ for(let i=0;i<n;i++) ang.push(360/n); }
+    else{ let w=[],sum=0;
+      do{ w=[];sum=0; for(let i=0;i<n;i++){const v=1+Math.random()*3.2;w.push(v);sum+=v;} }
+      while(Math.max(...w)/Math.min(...w)<1.7);
+      ang=w.map(v=>v/sum*360);
+    }
+    let a=-90,paths='';
+    for(let i=0;i<n;i++){const a2=a+ang[i];
+      const on=Array.isArray(shaded)?shaded.includes(i):i<shaded;
+      paths+=sector(cx,cy,r,a,a2,on?'var(--shade)':'#fff'); a=a2;}
+    return `<svg viewBox="0 0 170 170" class="shape">${paths}<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--ink)" stroke-width="4"/></svg>`;
+  }
+  // choose a representation
+  function shapeHTML(shape, n, shaded, equal){
+    const inner = shape==='pie' ? pie(n,shaded,equal) : bar(n,shaded,equal);
+    const cls = shape==='pie' ? 'piewrap' : 'barwrap';
+    return `<div class="stageitem"><div class="${cls}">${inner}</div></div>`;
+  }
+
+  // ---------- generators ----------
+  const POOL=[2,3,4,4,5,6];
+  function gen_equal(){
+    const n=pick([2,3,4,5,6]); const shape=pick(['pie','bar']); const ok=Math.random()<0.5;
+    return {type:'equal', badge:'平分嗎', shape, n, equal:ok,
+      prompt:'「平分」就是每一份<b>都一樣大</b>。請看這張圖，有平分嗎？',
+      visual:shapeHTML(shape,n,0,ok),
+      options:shuffle([{t:'text',v:'有平分 ✅',correct:ok},{t:'text',v:'沒有平分 ❌',correct:!ok}]),
+      concept:[
+        `<span class="h">分數的第一步</span>：一定要先「平分」。`,
+        `平分 = 把東西分成 <span class="hl">每一份都一樣大</span>。`,
+        ok?`這張圖每一份大小都一樣，所以 <span class="pk">有平分</span> ✅`
+          :`這張圖有的大、有的小，大小不一樣，所以 <span class="pk">沒有平分</span> ❌`,
+        `沒有平分就不能用分數來說喔！`
+      ]};
+  }
+  function gen_unit(){
+    const n=pick([2,3,4,5,6]); const shape=pick(['pie','bar']);
+    const opts=[{t:'frac',m:1,nn:n,correct:true}];
+    const used=new Set([n]);
+    while(opts.length<3){const d=pick([2,3,4,5,6]); if(!used.has(d)){used.add(d);opts.push({t:'frac',m:1,nn:d,correct:false});}}
+    return {type:'unit', badge:'幾分之一', shape, n,
+      prompt:'平分後，<b>塗色的 1 份</b>是幾分之一？',
+      visual:shapeHTML(shape,n,1,true),
+      options:shuffle(opts),
+      concept:[
+        `<span class="h">數一數</span>：整個被平分成 <span class="hl">${n} 份</span>（分母）。`,
+        `塗色的只有 <span class="hl">1 份</span>（分子）。`,
+        `所以是 <span class="pk">${cn(n)}分之一</span>，寫成 ${frac(1,n)}。`,
+        `下面 ${n}＝分成幾份，上面 1＝拿了幾份。`
+      ]};
+  }
+  function gen_frac(){
+    const n=pick([3,4,5,6]); const m=1+rnd(n-1); const shape=pick(['pie','bar']);
+    const key=(a,b)=>a+'/'+b; const seen=new Set([key(m,n)]);
+    const opts=[{t:'frac',m,nn:n,correct:true}];
+    const cands=[[n-m,n],[m,Math.min(m+1,n)],[Math.max(m-1,1),n],[m+1,n+1]];
+    for(const [cm,cnn] of cands){ if(opts.length>=4)break;
+      if(cm>0&&cm<cnn&&!seen.has(key(cm,cnn))){seen.add(key(cm,cnn));opts.push({t:'frac',m:cm,nn:cnn,correct:false});} }
+    let g=0; while(opts.length<4&&g++<40){const d=pick([3,4,5,6]),mm=1+rnd(d-1);
+      if(!seen.has(key(mm,d))){seen.add(key(mm,d));opts.push({t:'frac',m:mm,nn:d,correct:false});}}
+    return {type:'frac', badge:'幾分之幾', shape, n, m,
+      prompt:'塗色的部分是<b>幾分之幾</b>？',
+      visual:shapeHTML(shape,n,m,true),
+      options:shuffle(opts).slice(0,4),
+      concept:[
+        `<span class="h">分母（下面）</span>：整個平分成 <span class="hl">${n} 份</span>。`,
+        `<span class="h">分子（上面）</span>：塗了 <span class="hl">${m} 份</span>。`,
+        `合起來就是 <span class="pk">${cn(n)}分之${cn(m)}</span> ${frac(m,n)}。`,
+        `記住：下面是「全部幾份」，上面是「塗了幾份」。`
+      ]};
+  }
+  function gen_read(){
+    const n=pick([2,3,4,5,6]); const m=1+rnd(n-1);
+    const seen=new Set(); const opts=[];
+    const add=(v,c)=>{ if(!seen.has(v)){seen.add(v); opts.push({t:'text',v,correct:!!c}); } };
+    add(`${cn(n)}分之${cn(m)}`,true);
+    add(`${cn(m)}分之${cn(n)}`);
+    if(m-1>=1) add(`${cn(n)}分之${cn(m-1)}`); else add(`${cn(n+1)}分之${cn(m)}`);
+    add(`${cn(m+1)}分之${cn(n)}`);
+    let g=0; while(opts.length<4&&g++<40){const d=2+rnd(5),mm=1+rnd(d-1); add(`${cn(d)}分之${cn(mm)}`);}
+    return {type:'read', badge:'怎麼唸', m, n,
+      prompt:'這個分數要怎麼<b>唸</b>呢？',
+      visual:`<div class="stage"><div class="bigfrac">${frac(m,n)}</div></div>`,
+      raw:true,
+      options:shuffle(opts).slice(0,4),
+      concept:[
+        `<span class="h">分數從下面先唸</span>。`,
+        `先唸分母 <span class="hl">${cn(n)} 分之</span>，再唸分子 <span class="hl">${cn(m)}</span>。`,
+        `所以 ${frac(m,n)} 唸作 <span class="pk">${cn(n)}分之${cn(m)}</span>。`
+      ]};
+  }
+  function gen_pick(){
+    const n=pick([2,3,4]);
+    const correct={n,shaded:1,equal:true,correct:true};
+    const distractors=shuffle([
+      {n,shaded:1,equal:false},                       // 沒平分
+      {n:(n===4?3:n+1),shaded:1,equal:true},          // 份數不對
+      {n,shaded:2,equal:true}                          // 塗了2份
+    ]).slice(0,3).map(d=>Object.assign(d,{correct:false}));
+    const opts=shuffle([correct,...distractors]).map(o=>({t:'shape',shape:'pie',n:o.n,shaded:o.shaded,equal:o.equal,correct:o.correct}));
+    return {type:'pick', badge:'選出正確圖', n,
+      prompt:`哪一個圖才是 ${frac(1,n)}（${cn(n)}分之一）？`,
+      visual:'', noStage:true,
+      options:opts,
+      concept:[
+        `<span class="h">要符合 ${frac(1,n)} 有兩個條件</span>：`,
+        `① 一定要 <span class="hl">平分成 ${n} 份</span>（每份一樣大）。`,
+        `② 只能 <span class="hl">塗 1 份</span>。`,
+        `沒平分的、份數不對的、塗太多份的，都不是 <span class="pk">${frac(1,n)}</span>。`
+      ]};
+  }
+  function gen_compare(){
+    let a=pick([2,3]); let b=pick([4,6]); if(a>=b)b=a+2;
+    const order=shuffle([{n:a},{n:b}]);
+    const fewer=a;
+    return {type:'compare', badge:'哪份較大', a, b,
+      prompt:`同樣大的披薩 🍕，一個平分給 <b>${a}</b> 人、一個平分給 <b>${b}</b> 人。哪一種，<b>每人拿到的 1 片比較大</b>？`,
+      visual:`<div class="stage">
+         <div class="stageitem"><div class="piewrap">${pie(order[0].n,1,true)}</div><div class="cap">分給 ${order[0].n} 人</div></div>
+         <div class="stageitem"><div class="piewrap">${pie(order[1].n,1,true)}</div><div class="cap">分給 ${order[1].n} 人</div></div>
+       </div>`, raw:true,
+      options:shuffle([{t:'text',v:`分給 ${a} 人`,correct:true},{t:'text',v:`分給 ${b} 人`,correct:false}]),
+      concept:[
+        `<span class="h">重要觀念</span>：同一個東西，<span class="hl">分的份數越多，每一份就越小</span>。`,
+        `分給 ${a} 人，每片比較大；分給 ${b} 人，每片比較小。`,
+        `所以 <span class="pk">分給 ${a} 人</span>，每人拿到的比較大。`,
+        `這也是為什麼 ${frac(1,a)} 比 ${frac(1,b)} 大喔！`
+      ]};
+  }
+  function gen_whole(){
+    const n=pick([2,3,4,6]); const shape=pick(['pie','bar']);
+    return {type:'whole', badge:'合起來是1', n,
+      prompt:`把 1 個蛋糕 🎂 平分成 <b>${n} 份</b>，<b>${n} 份全部合起來</b>是幾個蛋糕？`,
+      visual:shapeHTML(shape,n,n,true),
+      options:shuffle([{t:'text',v:'1 個',correct:true},{t:'text',v:`${n} 個`,correct:false},{t:'text',v:'半個',correct:false},{t:'text',v:`${frac(1,n)} 個`,correct:false}]).slice(0,4),
+      concept:[
+        `<span class="h">把所有份數合起來</span>，就回到原本<span class="hl">完整的 1 個</span>。`,
+        `${n} 份合起來 ＝ ${frac(n,n)} ＝ <span class="pk">1 個整體</span>。`,
+        `不管分成幾份，全部加回去都是「1」。`
+      ]};
+  }
+  function gen_shade(){
+    const n=pick([2,3,4,5,6]); const m=1+rnd(n);
+    return {type:'shade', badge:'動手塗塗看', n, m, noStage:true,
+      prompt:`這條巧克力平分成 <b>${n} 份</b>。請塗出 ${frac(m,n)}（也就是塗 <b>${m} 份</b>）。`,
+      mode:'shade',
+      concept:[
+        `<span class="h">看分母</span>：全部平分成 <span class="hl">${n} 份</span>。`,
+        `<span class="h">看分子</span>：要塗 <span class="hl">${m} 份</span>。`,
+        `塗滿 ${m} 份就是 <span class="pk">${frac(m,n)}</span> 了（塗哪幾格都可以）。`
+      ]};
+  }
+
+  const GRAPHIC=[gen_equal,gen_unit,gen_frac,gen_read,gen_pick,gen_compare,gen_whole,gen_shade];
+
+  // ---------- text (word-problem) generators ----------
+  const FOODS=[['披薩','🍕','片'],['蛋糕','🎂','塊'],['巧克力','🍫','塊'],['餅乾','🍪','片'],['西瓜','🍉','塊']];
+  const food=()=>pick(FOODS);
+  const fkey=(a,b)=>a+'/'+b;
+
+  function gen_share(){
+    const [name,emo]=food(); const n=pick([2,3,4,5,6]);
+    const opts=[{t:'frac',m:1,nn:n,correct:true}]; const used=new Set([n]);
+    while(opts.length<4){const d=pick([2,3,4,5,6,8]); if(!used.has(d)){used.add(d);opts.push({t:'frac',m:1,nn:d,correct:false});}}
+    return {type:'share', badge:'文字題・平分', raw:true,
+      visual:`<div class="stage scene">${emo}</div>`,
+      prompt:`一個${name}平分給 <b>${n}</b> 個人，每個人拿到這個${name}的幾分之幾？`,
+      options:shuffle(opts),
+      concept:[
+        `<span class="h">平分給 ${n} 個人</span> ＝ 把它分成 <span class="hl">${n} 等份</span>。`,
+        `每個人拿到其中 <span class="hl">1 份</span>。`,
+        `所以每人拿到 <span class="pk">${cn(n)}分之一</span> ${frac(1,n)}。`
+      ]};
+  }
+  function gen_eat(){
+    const [name,emo,unit]=food(); const n=pick([3,4,5,6,8]); const m=1+rnd(n-1);
+    const seen=new Set([fkey(m,n)]); const opts=[{t:'frac',m,nn:n,correct:true}];
+    const cands=[[n-m,n],[Math.min(m+1,n),n],[Math.max(m-1,1),n]];
+    for(const [cm,cnn] of cands){ if(opts.length>=4)break;
+      if(cm>0&&cm<cnn&&!seen.has(fkey(cm,cnn))){seen.add(fkey(cm,cnn));opts.push({t:'frac',m:cm,nn:cnn,correct:false});} }
+    let g=0; while(opts.length<4&&g++<40){const mm=1+rnd(n-1); if(!seen.has(fkey(mm,n))){seen.add(fkey(mm,n));opts.push({t:'frac',m:mm,nn:n,correct:false});}}
+    const who=pick(['小明','小美','哥哥','妹妹']);
+    return {type:'eat', badge:'文字題・幾分之幾', raw:true,
+      visual:`<div class="stage scene">${emo}</div>`,
+      prompt:`一個${name}平分成 <b>${n}</b> ${unit}，${who}吃了 <b>${m}</b> ${unit}。${who}吃了這個${name}的幾分之幾？`,
+      options:shuffle(opts).slice(0,4),
+      concept:[
+        `<span class="h">分母</span> ＝ 平分成幾${unit} ＝ <span class="hl">${n}</span>。`,
+        `<span class="h">分子</span> ＝ 吃了幾${unit} ＝ <span class="hl">${m}</span>。`,
+        `所以吃了 <span class="pk">${cn(n)}分之${cn(m)}</span> ${frac(m,n)}。`
+      ]};
+  }
+  function gen_meaning(){
+    const n=pick([3,4,5,6]); const m=1+rnd(n-1); const askDen=Math.random()<0.5;
+    const opts = askDen
+      ? shuffle([{t:'text',v:`平分成 ${n} 份`,correct:true},{t:'text',v:`拿了 ${n} 份`,correct:false},{t:'text',v:`一共 ${n} 個`,correct:false},{t:'text',v:`多 ${n} 份`,correct:false}])
+      : shuffle([{t:'text',v:`拿了 ${m} 份`,correct:true},{t:'text',v:`平分成 ${m} 份`,correct:false},{t:'text',v:`少 ${m} 份`,correct:false},{t:'text',v:`剩 ${m} 份`,correct:false}]);
+    return {type:'meaning', badge:'文字題・意義', raw:true,
+      visual:`<div class="stage"><div class="bigfrac">${frac(m,n)}</div></div>`,
+      prompt:`分數 ${frac(m,n)} 裡，${askDen?`下面的<b>「${n}」（分母）</b>`:`上面的<b>「${m}」（分子）</b>`}代表什麼意思？`,
+      options:opts,
+      concept:[
+        `<span class="h">分母（下面）</span> ＝ 把東西<span class="hl">平分成幾份</span>。`,
+        `<span class="h">分子（上面）</span> ＝ <span class="hl">拿了（塗了）幾份</span>。`,
+        askDen?`所以這裡的 ${n} 是 <span class="pk">平分成 ${n} 份</span>。`:`所以這裡的 ${m} 是 <span class="pk">拿了 ${m} 份</span>。`
+      ]};
+  }
+  function gen_wcompare(){
+    let a=pick([2,3]), b=pick([4,5,6]); if(a>=b)b=a+2;
+    const [name]=food();
+    return {type:'wcompare', badge:'文字題・比大小', raw:true,
+      visual:`<div class="stage scene">⚖️</div>`,
+      prompt:`同樣大的一個${name}，平分給 <b>${a}</b> 個人和平分給 <b>${b}</b> 個人。哪一種，<b>每個人分到的比較大</b>？`,
+      options:shuffle([{t:'text',v:`分給 ${a} 個人`,correct:true},{t:'text',v:`分給 ${b} 個人`,correct:false},{t:'text',v:'一樣大',correct:false}]),
+      concept:[
+        `<span class="h">重要觀念</span>：同一個東西，<span class="hl">分的人越多，每份越小</span>。`,
+        `分給 ${a} 人 → 每份大；分給 ${b} 人 → 每份小。`,
+        `所以 <span class="pk">分給 ${a} 個人</span> 比較大（${frac(1,a)} 比 ${frac(1,b)} 大）。`
+      ]};
+  }
+  function gen_readwrite(){
+    const n=pick([2,3,4,5,6]); const m=1+rnd(n-1);
+    const seen=new Set([fkey(m,n)]); const opts=[{t:'frac',m,nn:n,correct:true}];
+    for(const [cm,cnn] of [[n,m],[m,m],[n,n]]){ if(opts.length>=4)break;
+      if(cm>0&&cnn>0&&!seen.has(fkey(cm,cnn))){seen.add(fkey(cm,cnn));opts.push({t:'frac',m:cm,nn:cnn,correct:false});} }
+    let g=0; while(opts.length<4&&g++<40){const d=2+rnd(5),mm=1+rnd(d); if(!seen.has(fkey(mm,d))){seen.add(fkey(mm,d));opts.push({t:'frac',m:mm,nn:d,correct:false});}}
+    return {type:'readwrite', badge:'文字題・讀寫', raw:true,
+      visual:`<div class="stage scene">✏️</div>`,
+      prompt:`「<b>${cn(n)}分之${cn(m)}</b>」寫成分數，是哪一個？`,
+      options:shuffle(opts).slice(0,4),
+      concept:[
+        `<span class="h">先聽分母</span>：「${cn(n)}分之」→ 下面寫 <span class="hl">${n}</span>。`,
+        `<span class="h">再聽分子</span>：「${cn(m)}」→ 上面寫 <span class="hl">${m}</span>。`,
+        `所以是 <span class="pk">${frac(m,n)}</span>。`
+      ]};
+  }
+  function gen_samedenom(){
+    const [name]=food(); const n=pick([4,5,6,8]);
+    let m1=1+rnd(n-1), m2=1+rnd(n-1); while(m2===m1) m2=1+rnd(n-1);
+    const big=m1>m2?'哥哥':'弟弟';
+    return {type:'samedenom', badge:'文字題・誰比較多', raw:true,
+      visual:`<div class="stage scene">🍽️</div>`,
+      prompt:`一個${name}平分成 <b>${n}</b> 份。哥哥吃了 <b>${m1}</b> 份，弟弟吃了 <b>${m2}</b> 份。誰吃得比較多？`,
+      options:shuffle([{t:'text',v:'哥哥',correct:m1>m2},{t:'text',v:'弟弟',correct:m2>m1},{t:'text',v:'一樣多',correct:false}]),
+      concept:[
+        `<span class="h">分母一樣</span>（都分成 ${n} 份）時，<span class="hl">吃的份數越多就越多</span>。`,
+        `哥哥 ${frac(m1,n)}、弟弟 ${frac(m2,n)}。`,
+        `${Math.max(m1,m2)} 份比 ${Math.min(m1,m2)} 份多，所以 <span class="pk">${big}</span> 吃得比較多。`
+      ]};
+  }
+  const TEXT=[gen_share,gen_eat,gen_meaning,gen_wcompare,gen_readwrite,gen_samedenom];
+
+  const GENS=[...GRAPHIC,...TEXT];
+
+  // ---------- build 100-question session ----------
+  function buildSession(){
+    const N=GENS.length; let order=[];
+    for(let r=0;r<9;r++) for(let i=0;i<N;i++) order.push(i);
+    order=shuffle(order).slice(0,100);
+    return order.map(i=>GENS[i]());
+  }
+
+  const state={ session:buildSession(), idx:0, score:0, answered:false, tray:[] };
+
+  // ---------- option label ----------
+  function optLabel(o){
+    if(o.t==='text') return o.v;
+    if(o.t==='frac') return frac(o.m,o.nn);
+    if(o.t==='shape') return shapeHTML(o.shape,o.n,o.shaded,o.equal);
+    return '';
+  }
+
+  const badge=$('#badge'),question=$('#question'),stage=$('#stage'),
+        think=$('#think'),thinkBtn=$('#thinkBtn'),answer=$('#answer'),
+        fb=$('#fb'),nextQ=$('#nextQ'),cur=$('#cur'),fill=$('#fill'),scoreEl=$('#score');
+
+  function render(){
+    const q=state.session[state.idx];
+    state.answered=false; state.tray=[];
+    cur.textContent=state.idx+1;
+    fill.style.width=(state.idx/100*100)+'%';
+    badge.textContent=q.badge;
+    question.innerHTML=q.prompt;
+    think.className='think'; think.innerHTML='';
+    thinkBtn.className='thinkbtn'; thinkBtn.style.display='block'; thinkBtn.textContent='想一想 🤔（這題在教什麼）';
+    fb.className='fb'; fb.innerHTML='';
+    nextQ.className='nextq';
+
+    // stage
+    if(q.noStage){ stage.innerHTML=''; }
+    else if(q.raw){ stage.innerHTML=q.visual; }
+    else { stage.innerHTML='<div class="stage">'+q.visual+'</div>'; }
+
+    // answer area
+    if(q.mode==='shade') buildShade(q);
+    else buildOptions(q);
+  }
+
+  function buildOptions(q){
+    const isShape=q.type==='pick';
+    answer.innerHTML='<div class="opts"'+(isShape?' style="grid-template-columns:1fr 1fr"':'')+' id="opts"></div>';
+    const box=$('#opts');
+    q.options.forEach((o)=>{
+      const b=document.createElement('button');
+      b.className='opt'+(o.t==='shape'?' shapeopt':'');
+      b.innerHTML=optLabel(o);
+      b.addEventListener('click',()=>{
+        if(state.answered)return; state.answered=true;
+        const all=box.querySelectorAll('.opt');
+        all.forEach((btn,i)=>{ btn.disabled=true; if(q.options[i].correct)btn.classList.add('correct'); });
+        if(o.correct){ b.classList.add('correct'); good(); }
+        else { b.classList.add('wrong'); bad(); }
+        revealThink();
+      });
+      box.appendChild(b);
+    });
+  }
+
+  function buildShade(q){
+    answer.innerHTML=`<div style="margin-top:14px"><div class="cells" id="cells">
+        ${Array.from({length:q.n}).map((_,i)=>`<div class="cell" data-i="${i}"></div>`).join('')}
+      </div>
+      <div class="makeacts"><button class="clr" id="clr">清空</button><button class="done" id="done">完成 ✓</button></div></div>`;
+    stage.innerHTML='';
+    $('#cells').querySelectorAll('.cell').forEach(c=>c.addEventListener('click',()=>{
+      if(state.answered)return; c.classList.toggle('on');
+    }));
+    $('#clr').addEventListener('click',()=>{ if(state.answered)return; $('#cells').querySelectorAll('.cell').forEach(c=>c.classList.remove('on')); });
+    $('#done').addEventListener('click',()=>{
+      if(state.answered)return;
+      const on=$('#cells').querySelectorAll('.cell.on').length;
+      state.answered=true;
+      $('#cells').querySelectorAll('.cell').forEach(c=>c.style.pointerEvents='none');
+      if(on===q.m){ good(); }
+      else { bad(`你塗了 ${on} 份，要塗的是 ${q.m} 份喔。`); }
+      revealThink();
+    });
+  }
+
+  // ---------- think ----------
+  thinkBtn.addEventListener('click',()=>{
+    if(think.classList.contains('show')){ think.className='think'; thinkBtn.textContent='想一想 🤔（這題在教什麼）'; return; }
+    showThink(false); thinkBtn.textContent='收起提示 ▲';
+  });
+  function showThink(revealAll){
+    const q=state.session[state.idx];
+    think.innerHTML=q.concept.map((h,i)=>`<div class="step${(revealAll||i===0)?' on':''}">${h}</div>`).join('')
+      + (revealAll?'':`<div class="nextstep"><button id="nextStep">下一步 ▸</button></div>`);
+    think.className='think show';
+    if(!revealAll){
+      let k=0; const total=q.concept.length; const nb=$('#nextStep');
+      nb.addEventListener('click',()=>{ k++; const steps=think.querySelectorAll('.step');
+        if(k<total){steps[k].classList.add('on'); steps[k].scrollIntoView({block:'nearest',behavior:'smooth'});}
+        if(k>=total-1){nb.textContent='看完了！'; nb.disabled=true;} });
+    }
+  }
+  function revealThink(){ showThink(true); thinkBtn.style.display='none'; }
+
+  // ---------- feedback ----------
+  const PRAISE=['答對了！','太棒了！','觀念很清楚！','完全正確！','你好厲害！'];
+  function good(){
+    state.score++; scoreEl.textContent=state.score;
+    fb.className='fb good show'; fb.innerHTML=`<span class="em">🍰</span> ${pick(PRAISE)}`;
+    showNext();
+  }
+  function bad(extra){
+    fb.className='fb bad show';
+    fb.innerHTML=`<span class="em">💡</span> ${extra?extra+' ':''}看看下面的「想一想」，再記一次觀念！`;
+    showNext();
+  }
+  function showNext(){
+    fill.style.width=((state.idx+1)/100*100)+'%';
+    nextQ.textContent = state.idx>=99 ? '看成績 🏆' : '下一題 ▸';
+    nextQ.className='nextq show';
+    nextQ.scrollIntoView({block:'nearest',behavior:'smooth'});
+  }
+  nextQ.addEventListener('click',()=>{
+    if(state.idx>=99){ showResult(); return; }
+    state.idx++; render();
+    document.querySelector('.card').scrollIntoView({block:'start',behavior:'smooth'});
+  });
+
+  function showResult(){
+    const s=state.score;
+    let em='🎉',msg='';
+    if(s>=90){em='🏆';msg='太厲害了！分數觀念非常穩固！';}
+    else if(s>=75){em='🌟';msg='很棒！大部分觀念都掌握得很好！';}
+    else if(s>=60){em='💪';msg='不錯喔！再多練幾次會更熟！';}
+    else {em='🍀';msg='沒關係，每次練習都會更進步！';}
+    $('#card').innerHTML=`<div class="result">
+      <div class="em">${em}</div>
+      <h2>練習完成！</h2>
+      <div class="big">${s}<span> / 100</span></div>
+      <p>${msg}</p>
+      <button id="again">再玩 100 題 🔄</button>
+    </div>`;
+    $('#again').addEventListener('click',()=>{ location.reload(); });
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>
