@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>閱讀小探險・二年級閱讀測驗</title>
+<style>
+  :root{
+    --paper:#FFFDF6;
+    --card:#FFFFFF;
+    --ink:#2E3A2E;
+    --ink-soft:#5E6B5C;
+    --leaf:#3FA85C;
+    --leaf-deep:#2E8049;
+    --sky:#4E9FE0;
+    --sun:#FFC53D;
+    --coral:#F0786B;
+    --line:#EAE7DA;
+    --ok-bg:#E5F6E9;
+    --no-bg:#FCE8E5;
+    --shadow:0 6px 0 rgba(46,58,46,.06), 0 14px 30px rgba(46,58,46,.10);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:"PingFang TC","Heiti TC","Microsoft JhengHei","Noto Sans TC",sans-serif;
+    background:
+      radial-gradient(1200px 600px at 110% -10%, #FFF3D6 0%, transparent 55%),
+      radial-gradient(900px 500px at -10% 0%, #DDF2E4 0%, transparent 50%),
+      var(--paper);
+    color:var(--ink);
+    line-height:1.6;
+    min-height:100vh;
+  }
+  .app{max-width:760px;margin:0 auto;padding:18px 16px 90px;}
+
+  /* ---------- top bar ---------- */
+  .topbar{
+    position:sticky;top:0;z-index:20;
+    background:rgba(255,253,246,.92);
+    backdrop-filter:blur(8px);
+    margin:-18px -16px 14px;padding:14px 16px 12px;
+    border-bottom:1px solid var(--line);
+  }
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:19px;letter-spacing:.5px;}
+  .brand .logo{font-size:24px;}
+  .track{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;}
+  .pip{
+    flex:1 1 0;min-width:14px;height:10px;border-radius:6px;
+    background:var(--line);transition:background .25s,transform .25s;
+  }
+  .pip.done{background:var(--leaf);}
+  .pip.cur{background:var(--sun);transform:scaleY(1.5);}
+  .counter{font-size:13px;color:var(--ink-soft);margin-top:8px;font-weight:600;}
+
+  /* ---------- start screen ---------- */
+  .hero{
+    text-align:center;padding:40px 22px 30px;
+    background:var(--card);border-radius:28px;box-shadow:var(--shadow);
+    border:2px solid #fff;margin-top:8px;
+  }
+  .hero .big{font-size:58px;line-height:1;margin-bottom:6px;}
+  .hero h1{font-size:30px;margin:6px 0 4px;letter-spacing:1px;}
+  .hero p{color:var(--ink-soft);font-size:17px;margin:6px 0 0;}
+  .hero .meta{
+    display:inline-flex;gap:18px;margin-top:18px;padding:10px 18px;
+    background:#F5FAF1;border-radius:16px;font-size:15px;color:var(--leaf-deep);font-weight:700;
+  }
+
+  /* ---------- buttons ---------- */
+  .btn{
+    appearance:none;border:none;cursor:pointer;font-family:inherit;font-weight:800;
+    border-radius:18px;padding:15px 26px;font-size:18px;color:#fff;
+    background:var(--leaf);box-shadow:0 5px 0 var(--leaf-deep);
+    transition:transform .08s, box-shadow .08s, opacity .2s;
+  }
+  .btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--leaf-deep);}
+  .btn:disabled{opacity:.45;box-shadow:none;cursor:default;transform:none;}
+  .btn.ghost{background:#fff;color:var(--leaf-deep);box-shadow:0 0 0 2px var(--line) inset;}
+  .btn.ghost:active{transform:translateY(2px);}
+  .btn.big{display:block;width:100%;margin-top:26px;font-size:20px;padding:18px;}
+
+  /* ---------- passage card ---------- */
+  .card{
+    background:var(--card);border-radius:26px;box-shadow:var(--shadow);
+    border:2px solid #fff;padding:22px 20px 24px;margin-top:4px;
+  }
+  .ptitle{display:flex;align-items:center;gap:10px;font-size:23px;font-weight:800;margin:2px 0 14px;}
+  .ptitle .em{font-size:30px;}
+  .passage{
+    background:#FBFAF3;border:1px dashed #E2DEC9;border-radius:18px;
+    padding:18px 18px;font-size:19px;line-height:2;letter-spacing:.5px;color:#33402F;
+  }
+  .passage .first{font-weight:800;}
+
+  /* ---------- questions ---------- */
+  .q{margin-top:20px;padding-top:18px;border-top:2px dotted var(--line);}
+  .q:first-of-type{border-top:none;margin-top:8px;}
+  .qnum{
+    display:inline-block;background:var(--sky);color:#fff;font-weight:800;
+    border-radius:10px;padding:2px 10px;font-size:14px;margin-bottom:8px;
+  }
+  .qtext{font-size:18px;font-weight:700;margin:0 0 12px;line-height:1.5;}
+  .opt{
+    display:flex;align-items:center;gap:12px;width:100%;text-align:left;
+    background:#fff;border:2px solid var(--line);border-radius:16px;
+    padding:13px 14px;margin:9px 0;font-size:17px;font-family:inherit;color:var(--ink);
+    cursor:pointer;transition:border-color .15s, background .15s, transform .08s;
+  }
+  .opt:active{transform:scale(.99);}
+  .opt .mark{
+    flex:0 0 30px;height:30px;border-radius:50%;display:grid;place-items:center;
+    background:#EEF3EC;color:var(--leaf-deep);font-weight:800;font-size:16px;
+  }
+  .opt.correct{border-color:var(--leaf);background:var(--ok-bg);}
+  .opt.correct .mark{background:var(--leaf);color:#fff;}
+  .opt.wrong{border-color:var(--coral);background:var(--no-bg);}
+  .opt.wrong .mark{background:var(--coral);color:#fff;}
+  .opt.locked{cursor:default;}
+  .opt.dim{opacity:.55;}
+  .feedback{
+    margin:8px 0 2px;font-size:15px;font-weight:700;border-radius:14px;padding:10px 14px;display:none;
+  }
+  .feedback.show{display:block;}
+  .feedback.good{background:var(--ok-bg);color:var(--leaf-deep);}
+  .feedback.bad{background:var(--no-bg);color:#C24A3E;}
+
+  /* ---------- nav ---------- */
+  .nav{display:flex;gap:12px;margin-top:24px;}
+  .nav .btn{flex:1;}
+
+  /* ---------- result ---------- */
+  .result{text-align:center;padding:36px 22px;background:var(--card);border-radius:28px;box-shadow:var(--shadow);border:2px solid #fff;}
+  .result .stars{font-size:46px;letter-spacing:6px;margin:4px 0 8px;}
+  .result h2{font-size:28px;margin:6px 0;}
+  .score{font-size:54px;font-weight:900;color:var(--leaf-deep);line-height:1;margin:10px 0;}
+  .score small{font-size:22px;color:var(--ink-soft);font-weight:700;}
+  .result p{color:var(--ink-soft);font-size:17px;}
+  .review{margin-top:18px;text-align:left;}
+  .review h3{font-size:16px;color:var(--ink-soft);margin:0 0 8px;}
+  .ritem{background:#FBFAF3;border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin:8px 0;font-size:15px;}
+  .ritem b{color:var(--coral);}
+
+  /* ---------- print worksheet ---------- */
+  .print-sheet{display:none;}
+  @media print{
+    @page{margin:14mm;}
+    body{background:#fff;}
+    .app{display:none !important;}
+    .print-sheet{display:block;color:#000;font-size:13.5px;line-height:1.8;}
+    .print-sheet h1{text-align:center;font-size:20px;margin:0 0 4px;}
+    .print-sheet .sub{text-align:center;color:#444;font-size:12px;margin-bottom:14px;}
+    .print-sheet .pp{page-break-inside:avoid;margin-bottom:16px;}
+    .print-sheet .pt{font-weight:800;font-size:15px;margin:0 0 4px;}
+    .print-sheet .ptx{border:1px solid #ccc;border-radius:8px;padding:8px 10px;margin-bottom:6px;}
+    .print-sheet .pq{margin:6px 0 0;}
+    .print-sheet .po{margin-left:14px;}
+  }
+  @media (max-width:430px){
+    .passage{font-size:18px;}
+    .hero h1{font-size:26px;}
+    .ptitle{font-size:20px;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{transition:none !important;}
+  }
+</style>
+</head>
+<body>
+<div class="app" id="app"><!-- rendered by JS --></div>
+<div class="print-sheet" id="printSheet"></div>
+
+<script>
+const PASSAGES = [
+  {
+    title:"小蝸牛", em:"🐌",
+    text:"雨停了，太陽公公露出笑臉。小蝸牛從葉子下面慢慢爬出來。牠背著重重的殼，那是牠走到哪裡都要帶著的家。小蝸牛爬過石頭，爬過小草，在地上留下一條亮亮的、彎彎的線。牠不著急，因為牠知道，慢慢走也能到想去的地方。",
+    qs:[
+      {q:"小蝸牛是什麼時候爬出來的？", o:["下雨的時候","雨停以後","晚上"], a:1, e:"文章說「雨停了……小蝸牛慢慢爬出來」。"},
+      {q:"小蝸牛走到哪裡都要帶著什麼？", o:["牠的殼（家）","一片葉子","一顆石頭"], a:0, e:"殼就是蝸牛的家，走到哪都帶著。"},
+      {q:"小蝸牛在地上留下了什麼？", o:["紅紅的點","亮亮彎彎的線","圓圓的洞"], a:1, e:"文中說留下「亮亮的、彎彎的線」。"},
+      {q:"「牠不著急」是什麼意思？", o:["牠很生氣","牠不慌不忙","牠很害怕"], a:1, e:"「不著急」就是慢慢來、不慌不忙。"},
+      {q:"這篇短文想告訴我們什麼？", o:["蝸牛很可怕","慢慢走也能到想去的地方","下雨不能出門"], a:1, e:"最後一句正是這篇的重點。"}
+    ]
+  },
+  {
+    title:"媽媽的生日", em:"🎂",
+    text:"今天是媽媽的生日。小華沒有錢買禮物，他想了想，決定自己動手做。他用色紙折了一朵紙花，又在卡片上畫了全家人。晚上，他把卡片送給媽媽，還幫忙把碗洗乾淨。媽媽抱著小華說：「這是我收過最棒的禮物。」小華聽了，心裡甜甜的。",
+    qs:[
+      {q:"今天是誰的生日？", o:["小華","媽媽","爸爸"], a:1, e:"第一句就說「今天是媽媽的生日」。"},
+      {q:"小華為什麼自己動手做禮物？", o:["他沒有錢買","他不喜歡買的","商店關門了"], a:0, e:"文中說他「沒有錢買禮物」。"},
+      {q:"小華做了哪些事？", o:["折紙花、畫卡片、洗碗","買蛋糕","打掃房間"], a:0, e:"他折花、畫卡片，還幫忙洗碗。"},
+      {q:"媽媽覺得這個禮物怎麼樣？", o:["普普通通","最棒的禮物","太小了"], a:1, e:"媽媽說「這是我收過最棒的禮物」。"},
+      {q:"「心裡甜甜的」是說小華覺得？", o:["很開心","很難過","想吃糖"], a:0, e:"「甜甜的」在這裡是形容心情很開心。"}
+    ]
+  },
+  {
+    title:"螞蟻搬家", em:"🐜",
+    text:"一群小螞蟻排成長長的隊伍，一個接一個往高處爬。牠們的嘴裡咬著白白的東西，那是螞蟻的食物。奶奶看見了，笑著說：「螞蟻搬家，快要下雨了。」小安抬頭看天，天空果然灰灰的。不久，豆大的雨點就「滴答滴答」打了下來。",
+    qs:[
+      {q:"小螞蟻排成什麼樣子前進？", o:["長長的隊伍","一個圓圈","散散亂亂"], a:0, e:"文中說「排成長長的隊伍」。"},
+      {q:"螞蟻嘴裡咬的白白東西是什麼？", o:["石頭","食物","紙"], a:1, e:"文中說「那是螞蟻的食物」。"},
+      {q:"奶奶說螞蟻搬家代表什麼？", o:["快下雨了","天氣很熱","要過年"], a:0, e:"奶奶說「螞蟻搬家，快要下雨了」。"},
+      {q:"後來天空變得怎麼樣？", o:["藍藍的","灰灰的","紅紅的"], a:1, e:"小安看天，「天空果然灰灰的」。"},
+      {q:"「滴答滴答」是在形容什麼聲音？", o:["打雷","下雨","風吹"], a:1, e:"這是雨點打下來的聲音。"}
+    ]
+  },
+  {
+    title:"種子的旅行", em:"🌼",
+    text:"蒲公英的種子長著白白的小傘。風一吹，種子就離開媽媽，飄到很遠的地方。有的落在草地上，有的落在田裡。等到春天，它們在新的地方發芽、長大，開出黃色的小花。原來，種子也會旅行，去找一個適合自己長大的家。",
+    qs:[
+      {q:"蒲公英的種子長著什麼？", o:["白白的小傘","硬硬的殼","長長的腳"], a:0, e:"文中說種子「長著白白的小傘」。"},
+      {q:"種子是靠什麼離開媽媽的？", o:["水","風","鳥"], a:1, e:"「風一吹，種子就離開媽媽」。"},
+      {q:"種子在什麼季節發芽長大？", o:["冬天","春天","秋天"], a:1, e:"文中說「等到春天……發芽、長大」。"},
+      {q:"蒲公英開什麼顏色的花？", o:["紅色","黃色","白色"], a:1, e:"文中說「開出黃色的小花」。"},
+      {q:"這篇短文主要在說什麼？", o:["種子怎麼旅行去長大","怎麼澆水","風很大"], a:0, e:"整篇都在講種子旅行、找新家長大。"}
+    ]
+  },
+  {
+    title:"愛畫畫的小美", em:"🎨",
+    text:"小美最喜歡畫畫。一開始，她畫的小狗不太像，旁邊的同學笑了。小美沒有哭，她每天放學都練習。她畫了一張又一張，把畫貼滿了房間的牆。過了幾個月，小美畫的小狗又可愛又生動。老師把她的畫貼在教室，全班都拍手。",
+    qs:[
+      {q:"小美最喜歡做什麼？", o:["唱歌","畫畫","跑步"], a:1, e:"第一句說「小美最喜歡畫畫」。"},
+      {q:"一開始同學為什麼笑她？", o:["畫得不太像","她跌倒了","她遲到了"], a:0, e:"因為她「畫的小狗不太像」。"},
+      {q:"被笑以後，小美怎麼做？", o:["不畫了","每天練習","大哭"], a:1, e:"她沒哭，「每天放學都練習」。"},
+      {q:"後來小美的畫被貼在哪裡？", o:["牆角","教室","抽屜"], a:1, e:"老師把她的畫「貼在教室」。"},
+      {q:"這個故事告訴我們什麼？", o:["被笑就要放棄","多練習就會進步","畫畫很難"], a:1, e:"小美靠每天練習，畫得越來越好。"}
+    ]
+  },
+  {
+    title:"月亮", em:"🌙",
+    text:"晚上，月亮高高掛在天上。它有時圓圓的，像一個大盤子；有時彎彎的，像一條小船。月亮自己不會發光，我們看到的亮光，其實是太陽照在月亮上反射回來的。月亮每天的樣子都不太一樣，這就是為什麼會有「月圓」和「月缺」。",
+    qs:[
+      {q:"圓圓的月亮像什麼？", o:["大盤子","小船","雞蛋"], a:0, e:"文中說圓月「像一個大盤子」。"},
+      {q:"彎彎的月亮像什麼？", o:["盤子","小船","皮球"], a:1, e:"文中說彎月「像一條小船」。"},
+      {q:"月亮的亮光是從哪裡來的？", o:["月亮自己發光","太陽的光反射來的","星星借的"], a:1, e:"月亮自己不發光，是反射太陽的光。"},
+      {q:"月亮每天的樣子？", o:["都一樣","不太一樣","看不到"], a:1, e:"文中說「每天的樣子都不太一樣」。"},
+      {q:"「月缺」是說月亮？", o:["不圓、缺了一塊","完全不見了","變得很大"], a:0, e:"「缺」就是不圓、缺了一塊。"}
+    ]
+  },
+  {
+    title:"分一半", em:"🍪",
+    text:"下課時，小傑帶了一包餅乾。好朋友阿明站在旁邊，眼睛一直看著餅乾，可是沒有說話。小傑想起媽媽說過：「好東西要和朋友分享。」於是他打開袋子，分了一半給阿明。兩個人邊吃邊聊，笑得好開心。原來，分享會讓快樂變成兩倍。",
+    qs:[
+      {q:"小傑帶了什麼到學校？", o:["餅乾","玩具","故事書"], a:0, e:"文中說小傑「帶了一包餅乾」。"},
+      {q:"阿明一直看著餅乾，最可能是因為？", o:["他也想吃","餅乾很奇怪","他在數數"], a:0, e:"一直盯著看又沒說話，是因為他也想吃。"},
+      {q:"媽媽說過什麼話？", o:["好東西和朋友分享","不要亂吃東西","早點回家"], a:0, e:"媽媽說「好東西要和朋友分享」。"},
+      {q:"小傑分了多少餅乾給阿明？", o:["一片","一半","全部"], a:1, e:"文中說他「分了一半給阿明」。"},
+      {q:"這個故事告訴我們什麼？", o:["分享會讓快樂變兩倍","餅乾很好吃","不要分東西"], a:0, e:"最後一句正是這篇的重點。"}
+    ]
+  },
+  {
+    title:"春天來了", em:"🌸",
+    text:"冬天過去，春天悄悄來了。樹枝上冒出嫩嫩的綠芽，公園裡的花一朵朵開了。小鳥站在枝頭，「啾啾」地唱歌。脫下厚厚的外套，小朋友在草地上跑來跑去。風吹在臉上，暖暖的、軟軟的，真舒服。大家都喜歡這個美麗的季節。",
+    qs:[
+      {q:"春天來之前是什麼季節？", o:["夏天","冬天","秋天"], a:1, e:"文中說「冬天過去，春天悄悄來了」。"},
+      {q:"樹枝上冒出了什麼？", o:["嫩嫩的綠芽","白白的雪","紅紅的果子"], a:0, e:"文中說「冒出嫩嫩的綠芽」。"},
+      {q:"小鳥站在枝頭做什麼？", o:["睡覺","唱歌","飛走了"], a:1, e:"小鳥「啾啾地唱歌」。"},
+      {q:"春天的風吹在臉上感覺怎麼樣？", o:["冷冷的","暖暖軟軟的","刺刺的"], a:1, e:"文中說風「暖暖的、軟軟的，真舒服」。"},
+      {q:"「悄悄來了」是說春天？", o:["很吵地來","安安靜靜地來","沒有來"], a:1, e:"「悄悄」就是安靜、不出聲。"}
+    ]
+  },
+  {
+    title:"上圖書館", em:"📚",
+    text:"星期六，爸爸帶小芳去圖書館。圖書館裡好安靜，大家都輕輕地走路、小小聲說話。小芳找到一本恐龍的書，坐在椅子上認真地看。看完以後，她把書放回原來的位置，這樣別人才找得到。離開前，小芳還借了兩本書回家看。",
+    qs:[
+      {q:"小芳是哪一天去圖書館的？", o:["星期一","星期六","星期日"], a:1, e:"第一句說「星期六……去圖書館」。"},
+      {q:"在圖書館裡應該怎麼做？", o:["大聲說話","輕輕走、小聲說","跑來跑去"], a:1, e:"文中說大家「輕輕地走、小小聲說話」。"},
+      {q:"小芳找到了什麼書？", o:["恐龍的書","唱歌的書","數學的書"], a:0, e:"她找到「一本恐龍的書」。"},
+      {q:"看完書後，小芳把書怎麼了？", o:["放回原來的位置","帶走","丟在桌上"], a:0, e:"她「把書放回原來的位置」。"},
+      {q:"為什麼要把書放回原位？", o:["這樣別人才找得到","比較好看","沒有原因"], a:0, e:"文中說「這樣別人才找得到」。"}
+    ]
+  },
+  {
+    title:"小水滴的旅行", em:"💧",
+    text:"太陽出來了，把河裡的水曬得暖暖的。小水滴變成看不見的水蒸氣，輕輕飄到天上，和好多水滴抱在一起，變成白白的雲。雲裡的水滴越來越多、越來越重，最後就變成雨，落回地面。小水滴又回到了河裡，準備下一次的旅行。",
+    qs:[
+      {q:"是什麼把河水曬暖的？", o:["月亮","太陽","風"], a:1, e:"文中說「太陽……把河裡的水曬得暖暖的」。"},
+      {q:"小水滴飄到天上，抱在一起變成什麼？", o:["雲","雪","霧"], a:0, e:"許多水滴抱在一起「變成白白的雲」。"},
+      {q:"雲裡的水滴越來越重，最後變成什麼？", o:["雨","星星","冰塊"], a:0, e:"水滴太重，「最後就變成雨」。"},
+      {q:"雨落下後，小水滴回到哪裡？", o:["山頂","河裡","屋頂"], a:1, e:"文中說「小水滴又回到了河裡」。"},
+      {q:"這篇短文主要在說什麼？", o:["小水滴怎麼變成雲又變成雨","太陽很大","怎麼游泳"], a:0, e:"整篇在講小水滴變雲、變雨的旅行。"}
+    ]
+  }
+];
+
+const GOOD = ["答對了！🎉","好棒！✨","太厲害了！👍","完全正確！🌟"];
+const TOTAL_Q = PASSAGES.reduce((s,p)=>s+p.qs.length,0);
+
+let cur = 0;
+// answers[p][q] = chosen index or null
+const answers = PASSAGES.map(p=>p.qs.map(()=>null));
+
+const app = document.getElementById('app');
+
+function topbar(){
+  const pips = PASSAGES.map((_,i)=>{
+    const done = answers[i].every(a=>a!==null);
+    const cls = i===cur ? 'pip cur' : (done ? 'pip done' : 'pip');
+    return `<div class="${cls}"></div>`;
+  }).join('');
+  return `<div class="topbar">
+    <div class="brand"><span class="logo">🦉</span>閱讀小探險</div>
+    <div class="track">${pips}</div>
+    <div class="counter">第 ${cur+1} 篇 / 共 ${PASSAGES.length} 篇</div>
+  </div>`;
+}
+
+function renderStart(){
+  app.innerHTML = `
+  <div class="topbar">
+    <div class="brand"><span class="logo">🦉</span>閱讀小探險</div>
+    <div class="counter">國小二年級・閱讀理解測驗</div>
+  </div>
+  <div class="hero">
+    <div class="big">📖✨</div>
+    <h1>閱讀小探險</h1>
+    <p>讀一篇短文，回答問題，看看你能讀懂多少！</p>
+    <div class="meta"><span>📚 ${PASSAGES.length} 篇短文</span><span>❓ 每篇 5 題</span></div>
+    <button class="btn big" onclick="start()">開始閱讀 ▶</button>
+    <button class="btn ghost big" onclick="printWorksheet()" style="margin-top:12px;">📄 列印測驗卷（紙本）</button>
+  </div>`;
+}
+
+function start(){ cur=0; renderPassage(); window.scrollTo(0,0); }
+
+function renderPassage(){
+  const p = PASSAGES[cur];
+  const qsHtml = p.qs.map((q,qi)=>{
+    const chosen = answers[cur][qi];
+    const locked = chosen!==null;
+    const opts = q.o.map((txt,oi)=>{
+      const mark = ['①','②','③','④'][oi];
+      let cls = 'opt';
+      if(locked){
+        cls += ' locked';
+        if(oi===q.a) cls += ' correct';
+        else if(oi===chosen) cls += ' wrong';
+        else cls += ' dim';
+      }
+      const click = locked ? '' : `onclick="answer(${qi},${oi})"`;
+      return `<button class="${cls}" ${click}><span class="mark">${mark}</span><span>${txt}</span></button>`;
+    }).join('');
+    let fb = '';
+    if(locked){
+      const right = chosen===q.a;
+      const head = right ? GOOD[qi % GOOD.length] : '再看看短文喔～';
+      fb = `<div class="feedback show ${right?'good':'bad'}">${head}　${q.e}</div>`;
+    }
+    return `<div class="q">
+      <span class="qnum">第 ${qi+1} 題</span>
+      <p class="qtext">${q.q}</p>
+      ${opts}
+      ${fb}
+    </div>`;
+  }).join('');
+
+  const allDone = answers[cur].every(a=>a!==null);
+  const isLast = cur===PASSAGES.length-1;
+  const nextLabel = isLast ? '看成績 🏁' : '下一篇 ▶';
+  const nextDis = allDone ? '' : 'disabled';
+  const prevDis = cur===0 ? 'disabled' : '';
+
+  app.innerHTML = topbar() + `
+  <div class="card">
+    <div class="ptitle"><span class="em">${p.em}</span>${cur+1}、${p.title}</div>
+    <div class="passage">${p.text}</div>
+    ${qsHtml}
+    <div class="nav">
+      <button class="btn ghost" ${prevDis} onclick="prev()">◀ 上一篇</button>
+      <button class="btn" ${nextDis} onclick="next()">${nextLabel}</button>
+    </div>
+    ${allDone ? '' : '<div class="counter" style="text-align:center;margin-top:10px;">把 5 題都作答完，就能繼續喔！</div>'}
+  </div>`;
+}
+
+function answer(qi, oi){
+  if(answers[cur][qi]!==null) return;
+  answers[cur][qi] = oi;
+  renderPassage();
+}
+
+function next(){
+  if(!answers[cur].every(a=>a!==null)) return;
+  if(cur===PASSAGES.length-1){ renderResult(); }
+  else { cur++; renderPassage(); }
+  window.scrollTo(0,0);
+}
+function prev(){ if(cur>0){ cur--; renderPassage(); window.scrollTo(0,0);} }
+
+function renderResult(){
+  let correct=0;
+  const wrongs=[];
+  PASSAGES.forEach((p,pi)=>{
+    p.qs.forEach((q,qi)=>{
+      if(answers[pi][qi]===q.a) correct++;
+      else wrongs.push({pi,qi,q});
+    });
+  });
+  const pct = correct/TOTAL_Q;
+  let stars, msg;
+  if(pct>=0.9){ stars='⭐⭐⭐'; msg='閱讀高手！你讀得又快又仔細，太棒了！'; }
+  else if(pct>=0.7){ stars='⭐⭐'; msg='讀得很好！再加把勁就更厲害了。'; }
+  else { stars='⭐'; msg='很努力！多讀幾次短文，下次會更進步。'; }
+
+  let reviewHtml='';
+  if(wrongs.length){
+    const items = wrongs.map(w=>{
+      const right = w.q.o[w.q.a];
+      return `<div class="ritem">📘 第 ${w.pi+1} 篇・第 ${w.qi+1} 題　正確答案：<b>${right}</b><br>${w.q.e}</div>`;
+    }).join('');
+    reviewHtml = `<div class="review"><h3>需要再看看的題目（${wrongs.length} 題）</h3>${items}</div>`;
+  } else {
+    reviewHtml = `<div class="review"><div class="ritem" style="color:var(--leaf-deep);">🌟 全部答對，太厲害了！</div></div>`;
+  }
+
+  app.innerHTML = topbar() + `
+  <div class="result">
+    <div class="stars">${stars}</div>
+    <h2>完成囉！</h2>
+    <div class="score">${correct}<small> / ${TOTAL_Q} 題</small></div>
+    <p>${msg}</p>
+    ${reviewHtml}
+    <button class="btn big" onclick="restart()">再玩一次 🔄</button>
+    <button class="btn ghost big" onclick="printWorksheet()" style="margin-top:12px;">📄 列印測驗卷（紙本）</button>
+  </div>`;
+}
+
+function restart(){
+  cur=0;
+  PASSAGES.forEach((p,i)=>p.qs.forEach((q,qi)=>answers[i][qi]=null));
+  renderStart();
+  window.scrollTo(0,0);
+}
+
+function buildPrintSheet(){
+  const ps = document.getElementById('printSheet');
+  const body = PASSAGES.map((p,pi)=>{
+    const qs = p.qs.map((q,qi)=>{
+      const opts = q.o.map((t,oi)=>`${['①','②','③','④'][oi]} ${t}`).join('　　');
+      return `<div class="pq">（${qi+1}）${q.q}<div class="po">${opts}（　）</div></div>`;
+    }).join('');
+    return `<div class="pp"><div class="pt">${pi+1}、${p.title}</div><div class="ptx">${p.text}</div>${qs}</div>`;
+  }).join('');
+  ps.innerHTML = `<h1>二年級閱讀測驗</h1><div class="sub">姓名：＿＿＿＿＿＿　班級：＿＿＿＿　座號：＿＿＿　得分：＿＿＿</div>${body}`;
+}
+
+function printWorksheet(){ buildPrintSheet(); window.print(); }
+
+renderStart();
+</script>
+</body>
+</html>
