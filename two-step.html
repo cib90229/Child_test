@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>兩步驟解題王・二年級下</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ECF3FB; --bg2:#DDEAF8; --panel:#FFFFFF;
+    --ink:#1F3D63; --ink-soft:#5E7593;
+    --s1:#4C8DD6; --s1-d:#3674BE;   /* 第一步 / 被乘數 藍 */
+    --s2:#F2913D; --s2-d:#D8741E;   /* 第二步 / 乘數 橙 */
+    --good:#3FB392; --good-d:#2E9A7B; --bad:#EF6F6F;
+    --line:#DCE7F2;
+    --shadow:0 10px 28px rgba(31,61,99,.14);
+    --shadow-sm:0 4px 12px rgba(31,61,99,.12);
+    --num:"Baloo 2","PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;
+    --body:"Nunito","PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{font-family:var(--body);
+    background:radial-gradient(1100px 560px at 50% -8%, var(--bg) 0%, var(--bg2) 72%) fixed;
+    color:var(--ink); min-height:100vh; padding:16px 14px 56px; display:flex; justify-content:center}
+  .wrap{width:100%; max-width:580px}
+
+  header{display:flex; align-items:center; gap:12px; margin-bottom:12px}
+  .logo{font-size:38px; line-height:1; filter:drop-shadow(0 3px 4px rgba(0,0,0,.12))}
+  .titles h1{font-family:var(--num); font-weight:800; font-size:24px; margin:0; letter-spacing:.5px}
+  .titles p{margin:2px 0 0; color:var(--ink-soft); font-weight:700; font-size:13px}
+
+  .banner{background:linear-gradient(90deg,#FFF2E4,#FDE9D2); border:2px solid var(--s2);
+    color:var(--s2-d); font-family:var(--num); font-weight:800; font-size:14px;
+    border-radius:14px; padding:10px 14px; margin-bottom:12px; text-align:center}
+
+  .topbar{display:flex; align-items:center; gap:10px; margin-bottom:14px}
+  .prog{flex:1; background:#fff; border-radius:14px; padding:8px 12px; box-shadow:var(--shadow-sm)}
+  .prog .lab{font-family:var(--num); font-weight:700; font-size:13px; color:var(--ink-soft); display:flex; justify-content:space-between}
+  .prog .lab b{color:var(--ink); font-size:15px}
+  .bar{height:8px; background:#E1EAF4; border-radius:99px; margin-top:5px; overflow:hidden}
+  .bar i{display:block; height:100%; width:0; background:linear-gradient(90deg,var(--s1),var(--s2)); border-radius:99px; transition:width .3s}
+  .scorechip{background:#fff; border-radius:14px; padding:8px 14px; box-shadow:var(--shadow-sm); font-weight:800; font-size:14px; white-space:nowrap}
+  .scorechip b{font-family:var(--num); font-size:20px; color:var(--good-d)}
+
+  .card{background:var(--panel); border-radius:26px; box-shadow:var(--shadow); padding:20px 18px; position:relative}
+  .badge{display:inline-block; font-family:var(--num); font-weight:700; font-size:12.5px;
+    padding:5px 13px; border-radius:999px; color:#fff; margin-bottom:12px;
+    background:linear-gradient(90deg,var(--s1),var(--s2))}
+  .qbox{background:linear-gradient(180deg,#F8FBFF,#EEF5FD); border:2px solid #DBE8F5;
+    border-radius:18px; padding:16px; margin-bottom:4px}
+  .q{font-family:var(--num); font-weight:600; font-size:20px; line-height:1.6; margin:0}
+  .q b{color:var(--s1-d)}
+  .lastnote{display:inline-block; margin-top:10px; background:#FDE6E6; color:var(--bad);
+    font-weight:800; font-size:13px; border-radius:8px; padding:3px 11px}
+
+  .thinkbtn{margin-top:14px; width:100%; border:none; cursor:pointer; font-family:var(--num);
+    font-weight:700; font-size:17px; padding:12px; border-radius:15px; background:#E5EFFA;
+    color:var(--s1-d); box-shadow:var(--shadow-sm); transition:transform .12s}
+  .thinkbtn:active{transform:scale(.98)}
+  .thinkbtn.nudge{animation:nudge .5s ease 2}
+  @keyframes nudge{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+
+  .think{margin-top:12px; display:none}
+  .think.show{display:block}
+  .stepcard{border-radius:16px; padding:13px 15px; margin-bottom:10px; font-family:var(--num);
+    font-weight:600; font-size:17px; line-height:1.55; display:none; animation:fade .3s ease}
+  .stepcard.on{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  .stepcard.intro{background:#EEF4FB; color:var(--ink-soft); font-weight:700; font-size:15px}
+  .stepcard.one{background:#EAF3FC; border:2px solid var(--s1)}
+  .stepcard.two{background:#FFF2E4; border:2px solid var(--s2)}
+  .stepcard.fin{background:#E4F6F0; border:2px solid var(--good)}
+  .tag{display:inline-block; font-weight:800; color:#fff; border-radius:8px; padding:1px 9px; margin-right:6px; font-size:14px}
+  .tag.t1{background:var(--s1)} .tag.t2{background:var(--s2)}
+  .ex{display:inline-block; background:#fff; border-radius:9px; padding:2px 11px; font-weight:800;
+    font-size:19px; color:var(--ink); margin-top:5px; box-shadow:0 2px 5px rgba(31,61,99,.08)}
+  .mulnote{margin-top:9px; background:#F4F8FD; border-radius:11px; padding:9px 11px;
+    font-size:14px; font-weight:700; color:var(--ink-soft); line-height:1.85}
+  .mtag{display:inline-block; color:#fff; border-radius:7px; padding:1px 8px; font-weight:800; font-size:13px; margin-right:3px}
+  .mtag.md{background:var(--s1)} .mtag.mr{background:var(--s2)}
+  .pk{color:var(--good-d); font-weight:800}
+  .nextstep button{width:100%; border:none; cursor:pointer; font-family:var(--num); font-weight:700;
+    font-size:15px; padding:10px; border-radius:13px; background:var(--s1); color:#fff}
+  .nextstep button:disabled{opacity:.45}
+
+  .answer{margin-top:16px}
+  .display{height:60px; border-radius:16px; background:#F1F6FC; border:2px solid #D6E4F2;
+    display:flex; align-items:center; justify-content:center; font-family:var(--num);
+    font-weight:800; font-size:32px; color:var(--ink); margin-bottom:10px}
+  .display .ph{color:#A9BFD6; font-size:19px}
+  .display .u{font-size:17px; color:var(--ink-soft); margin-left:6px; align-self:center}
+  .pad{display:grid; grid-template-columns:repeat(3,1fr); gap:9px}
+  .key{border:none; cursor:pointer; font-family:var(--num); font-weight:700; font-size:23px;
+    padding:14px 0; border-radius:15px; background:#fff; color:var(--ink); box-shadow:var(--shadow-sm); transition:transform .1s}
+  .key:active{transform:scale(.94)}
+  .key.fn{font-size:18px; background:#E8EFF7; color:var(--ink-soft)}
+  .key.ok{background:var(--good); color:#fff}
+
+  .concept{margin-top:16px}
+  .ctitle{font-family:var(--num); font-weight:700; font-size:16px; line-height:1.5; margin-bottom:10px}
+  .csmall{font-size:13px; color:var(--ink-soft); font-weight:700}
+  .opts{display:grid; grid-template-columns:1fr; gap:10px}
+  .opt{border:none; cursor:pointer; background:#fff; border-radius:16px; padding:13px 14px; box-shadow:var(--shadow-sm);
+    display:flex; flex-direction:column; align-items:flex-start; gap:2px; text-align:left; transition:transform .1s}
+  .opt:active{transform:scale(.98)}
+  .opt .ot{font-family:var(--num); font-weight:800; font-size:21px; color:var(--ink)}
+  .opt .osub{font-size:13px; font-weight:700; color:var(--ink-soft)}
+  .opt.correct{background:var(--good)} .opt.correct .ot,.opt.correct .osub{color:#fff}
+  .opt.wrong{background:var(--bad)} .opt.wrong .ot,.opt.wrong .osub{color:#fff}
+  .opt:disabled{cursor:default}
+  .cchip{margin-top:12px; border-radius:12px; padding:10px 12px; font-family:var(--num); font-weight:700; font-size:14px; line-height:1.55}
+  .cchip.ok{background:#DCF4EC; color:var(--good-d)}
+  .cchip.no{background:#FDECDC; color:var(--s2-d)}
+  .padlabel{font-family:var(--num); font-weight:700; font-size:15px; color:var(--ink-soft); margin:14px 0 8px}
+
+  .fb{margin-top:14px; border-radius:18px; padding:13px; text-align:center; font-family:var(--num);
+    font-weight:800; font-size:18px; display:none; align-items:center; justify-content:center; gap:9px}
+  .fb.show{display:flex; animation:fade .3s ease}
+  .fb.good{background:#DCF4EC; color:var(--good-d)}
+  .fb.bad{background:#FDE6E6; color:var(--bad)}
+  .fb .em{font-size:26px}
+  .nextq{margin-top:12px; width:100%; border:none; cursor:pointer; font-family:var(--num);
+    font-weight:800; font-size:19px; padding:15px; border-radius:18px; background:var(--s2);
+    color:#fff; box-shadow:var(--shadow-sm); display:none}
+  .nextq.show{display:block} .nextq:active{transform:scale(.98)}
+
+  .result{text-align:center; padding:14px 8px}
+  .result .em{font-size:60px}
+  .result h2{font-family:var(--num); font-weight:800; font-size:25px; margin:8px 0 4px}
+  .result .big{font-family:var(--num); font-weight:800; font-size:54px; color:var(--good-d); line-height:1.1}
+  .result .big span{font-size:25px; color:var(--ink-soft)}
+  .result p{color:var(--ink-soft); font-weight:700; font-size:16px; margin:10px 0 16px}
+  .result button{display:block; width:100%; border:none; cursor:pointer; font-family:var(--num);
+    font-weight:800; font-size:18px; padding:14px; border-radius:18px; margin-top:10px;
+    background:var(--s2); color:#fff; box-shadow:var(--shadow-sm)}
+  .result button.fix{background:var(--bad)}
+  .result button.alt{background:#E8EFF7; color:var(--ink-soft); box-shadow:none}
+
+  footer{text-align:center; color:var(--ink-soft); font-weight:700; font-size:12px; margin-top:20px; opacity:.7}
+  @media (max-width:380px){ .q{font-size:18px} .key{font-size:21px;padding:12px 0} }
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  :focus-visible{outline:3px solid var(--s1); outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">🕵️</div>
+    <div class="titles">
+      <h1>兩步驟解題王</h1>
+      <p>先想「先算什麼、再算什麼」— 二年級下・兩段運算</p>
+    </div>
+  </header>
+
+  <div class="banner" id="banner" style="display:none"></div>
+
+  <div class="topbar">
+    <div class="prog">
+      <div class="lab"><span id="progLabel">進度</span><span>第 <b id="cur">1</b> / <b id="tot">50</b> 題</span></div>
+      <div class="bar"><i id="fill"></i></div>
+    </div>
+    <div class="scorechip">⭐ <b id="score">0</b></div>
+  </div>
+
+  <div class="card" id="card">
+    <span class="badge" id="badge">題型</span>
+    <div class="qbox" id="qbox"><p class="q" id="question">準備中…</p></div>
+    <button class="thinkbtn" id="thinkBtn">想一想 🔎（先算什麼？再算什麼？）</button>
+    <div class="think" id="think"></div>
+    <div id="answer"></div>
+    <div class="fb" id="fb"></div>
+    <button class="nextq" id="nextQ">下一題 ▸</button>
+  </div>
+
+  <footer>共 50 題・每題兩個步驟，答錯的可以挑出來訂正重做 🧩</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  const $=s=>document.querySelector(s);
+  const rnd=n=>Math.floor(Math.random()*n);
+  const ri=(lo,hi)=>lo+rnd(hi-lo+1);
+  const pick=a=>a[rnd(a.length)];
+  const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]];}return a;};
+  const NAMES=['小明','小華','小美','小杰','阿光','小芳','大雄'];
+
+  // ===== templates: {cat,unit,prompt,s1d,s1e,s1r,s2d,s2e,ans,(mul,md,mdMean,mr,mrMean)} =====
+  function t_muladd(){
+    const [it,u]=pick([['餅乾','片'],['糖果','顆'],['鉛筆','枝'],['貼紙','張'],['彈珠','顆']]);
+    const a=ri(2,9), b=ri(2,9), c=ri(2,15); const p=a*b, ans=p+c; const who=pick(NAMES);
+    return {cat:'乘法 ＋ 加法', unit:u,
+      prompt:`一盒${it}有 <b>${a}</b> ${u}，${who}買了 <b>${b}</b> 盒，另外又拿了 <b>${c}</b> ${u}散裝的。一共有幾${u}？`,
+      s1d:`先算 ${b} 盒一共幾${u}`, s1e:`${a} × ${b}`, s1r:p,
+      s2d:`再加上散裝的 ${c} ${u}`, s2e:`${p} ＋ ${c}`, ans,
+      mul:true, md:a, mdMean:`每盒 ${a} ${u}`, mr:b, mrMean:`買了 ${b} 盒`};
+  }
+  function t_mulsub(){
+    const [it,u]=pick([['糖果','顆'],['餅乾','片'],['蘋果','顆'],['雞蛋','顆']]);
+    const a=ri(3,9), b=ri(2,9); const p=a*b; const c=ri(1,p-1); const ans=p-c; const who=pick(NAMES);
+    return {cat:'乘法 － 減法', unit:u,
+      prompt:`一袋${it}有 <b>${a}</b> ${u}，買了 <b>${b}</b> 袋，${who}吃掉了 <b>${c}</b> ${u}。還剩幾${u}？`,
+      s1d:`先算 ${b} 袋一共幾${u}`, s1e:`${a} × ${b}`, s1r:p,
+      s2d:`再減掉吃掉的 ${c} ${u}`, s2e:`${p} － ${c}`, ans,
+      mul:true, md:a, mdMean:`每袋 ${a} ${u}`, mr:b, mrMean:`買了 ${b} 袋`};
+  }
+  function t_money(){
+    const who=pick(NAMES); const x=ri(20,80), y=ri(10,60); const sum=x+y; const z=ri(10,sum-5); const ans=sum-z;
+    const thing=pick(['玩具','故事書','文具','點心','貼紙']);
+    return {cat:'加法 ＋ 減法（錢）', unit:'元',
+      prompt:`${who}有 <b>${x}</b> 元，媽媽再給他 <b>${y}</b> 元。買${thing}花了 <b>${z}</b> 元，還剩多少元？`,
+      s1d:`先算現在一共有多少錢`, s1e:`${x} ＋ ${y}`, s1r:sum,
+      s2d:`再減掉花掉的 ${z} 元`, s2e:`${sum} － ${z}`, ans, mul:false};
+  }
+  function t_subsub(){
+    const t=ri(80,200); let a=ri(10,60), b=ri(10,60), g=0; while(a+b>=t&&g++<60){a=ri(10,60);b=ri(10,60);}
+    const ans=t-a-b;
+    return {cat:'連續減法', unit:'本',
+      prompt:`圖書館有 <b>${t}</b> 本書，上午借走 <b>${a}</b> 本，下午又借走 <b>${b}</b> 本。還剩幾本？`,
+      s1d:`先算上午借走後剩幾本`, s1e:`${t} － ${a}`, s1r:t-a,
+      s2d:`再減掉下午借走的 ${b} 本`, s2e:`${t-a} － ${b}`, ans, mul:false};
+  }
+  function t_compare(){
+    const [u,it]=pick([['張','卡片'],['顆','彈珠'],['本','書'],['枝','色筆']]);
+    const x=ri(20,120); const d=ri(5,20); const isMore=(x-d<=0)?true:(Math.random()<0.5);
+    const B=isMore?x+d:x-d; const ans=x+B;
+    return {cat:'比較 ＋ 合計', unit:u,
+      prompt:`哥哥有 <b>${x}</b> ${u}${it}，弟弟比哥哥${isMore?'多':'少'} <b>${d}</b> ${u}。兩人一共有幾${u}？`,
+      s1d:`先算弟弟有幾${u}`, s1e:`${x} ${isMore?'＋':'－'} ${d}`, s1r:B,
+      s2d:`再把兩人加起來`, s2e:`${x} ＋ ${B}`, ans, mul:false};
+  }
+  function t_share(){
+    const [u,it]=pick([['顆','糖'],['枝','鉛筆'],['片','餅乾'],['張','貼紙']]);
+    const c=ri(2,6), p=ri(2,8); const used=c*p; const extra=ri(1,15); const T=used+extra; const ans=T-used;
+    return {cat:'乘法 － 減法', unit:u,
+      prompt:`要分給 <b>${p}</b> 個小朋友，每人 <b>${c}</b> ${u}${it}。袋子裡有 <b>${T}</b> ${u}，分完後還剩幾${u}？`,
+      s1d:`先算總共要分出去幾${u}`, s1e:`${c} × ${p}`, s1r:used,
+      s2d:`再從 ${T} ${u}裡減掉`, s2e:`${T} － ${used}`, ans,
+      mul:true, md:c, mdMean:`每人 ${c} ${u}`, mr:p, mrMean:`分給 ${p} 人`};
+  }
+  function t_length(){
+    const L=ri(50,100); let a=ri(10,35), b=ri(10,35), g=0; while(a+b>=L&&g++<60){a=ri(10,35);b=ri(10,35);}
+    const ans=L-a-b;
+    return {cat:'長度・連減（公分）', unit:'公分',
+      prompt:`一條緞帶長 <b>${L}</b> 公分，做花用掉 <b>${a}</b> 公分，綁禮物又用掉 <b>${b}</b> 公分。還剩幾公分？`,
+      s1d:`先算做花後剩幾公分`, s1e:`${L} － ${a}`, s1r:L-a,
+      s2d:`再減掉綁禮物的 ${b} 公分`, s2e:`${L-a} － ${b}`, ans, mul:false};
+  }
+  function t_times(){
+    const [u,it]=pick([['個','氣球'],['朵','花'],['隻','紙鶴'],['顆','星星']]);
+    const a=ri(3,12), k=ri(2,5); const other=a*k; const ans=a+other;
+    return {cat:'倍數 ＋ 合計', unit:u,
+      prompt:`紅色${it}有 <b>${a}</b> ${u}，黃色${it}是紅色的 <b>${k}</b> 倍。紅色和黃色${it}一共幾${u}？`,
+      s1d:`先算黃色${it}有幾${u}`, s1e:`${a} × ${k}`, s1r:other,
+      s2d:`再把紅色和黃色加起來`, s2e:`${a} ＋ ${other}`, ans,
+      mul:true, md:a, mdMean:`紅色 ${a} ${u}（基準量）`, mr:k, mrMean:`${k} 倍`};
+  }
+  function t_buy2(){
+    const x1=pick(['鉛筆','貼紙','糖果','橡皮擦']); const x2=pick(['筆記本','果汁','麵包','尺']);
+    const p1=ri(2,9), n=ri(2,9); const sub=p1*n; const p2=ri(5,30); const ans=sub+p2; const who=pick(NAMES);
+    return {cat:'乘法 ＋ 加法（錢）', unit:'元',
+      prompt:`一個${x1} <b>${p1}</b> 元，${who}買了 <b>${n}</b> 個；又買一個 <b>${p2}</b> 元的${x2}。一共要付多少元？`,
+      s1d:`先算買 ${x1} 的錢`, s1e:`${p1} × ${n}`, s1r:sub,
+      s2d:`再加上${x2}的 ${p2} 元`, s2e:`${sub} ＋ ${p2}`, ans,
+      mul:true, md:p1, mdMean:`一個 ${p1} 元`, mr:n, mrMean:`買了 ${n} 個`};
+  }
+
+  const TPL=[t_muladd,t_mulsub,t_money,t_subsub,t_compare,t_share,t_length,t_times,t_buy2];
+
+  function buildSession(){
+    const N=TPL.length; let order=[];
+    for(let r=0;r<6;r++) for(let i=0;i<N;i++) order.push(i);
+    order=shuffle(order).slice(0,50);
+    return order.map(i=>({q:TPL[i]()}));
+  }
+
+  const state={
+    list:buildSession(), idx:0, score:0, answered:false, typed:'',
+    mode:'quiz',           // 'quiz' | 'review'
+    wrong:[],              // {q,your} collected during quiz
+    againWrong:[],         // still wrong during a review pass
+    conceptOK:true,        // did they pick the right 乘法算式 this question
+    conceptMiss:0          // how many times 列式 was wrong (this quiz)
+  };
+
+  const badge=$('#badge'),qbox=$('#qbox'),think=$('#think'),thinkBtn=$('#thinkBtn'),
+        answer=$('#answer'),fb=$('#fb'),nextQ=$('#nextQ'),cur=$('#cur'),tot=$('#tot'),
+        fill=$('#fill'),scoreEl=$('#score'),banner=$('#banner'),progLabel=$('#progLabel');
+
+  function total(){ return state.list.length; }
+
+  function render(){
+    const entry=state.list[state.idx]; const q=entry.q;
+    state.answered=false; state.typed='';
+    cur.textContent=state.idx+1; tot.textContent=total();
+    fill.style.width=(state.idx/total()*100)+'%';
+    badge.textContent=q.cat;
+    qbox.innerHTML=`<p class="q">${q.prompt}</p>`+
+      (state.mode==='review'&&entry.your!=null?`<div class="lastnote">上次你填：${entry.your} ${q.unit}</div>`:'');
+    think.className='think'; think.innerHTML='';
+    thinkBtn.className='thinkbtn'; thinkBtn.style.display='block'; thinkBtn.textContent='想一想 🔎（先算什麼？再算什麼？）';
+    fb.className='fb'; fb.innerHTML=''; nextQ.className='nextq';
+    state.conceptOK = q.mul ? null : true;
+    buildAnswer(q);
+  }
+
+  // ----- answer flow: 乘法題先「列式」(揪出 被乘數/乘數)，再算答案 -----
+  function buildAnswer(q){ if(q.mul) buildConcept(q); else buildPad(q); }
+
+  function mulOptions(q){
+    const opts=[{txt:`${q.md} × ${q.mr}`, sub:`每份 ${q.md} × ${q.mr} 份`, correct:true}];
+    if(q.md!==q.mr) opts.push({txt:`${q.mr} × ${q.md}`, sub:`${q.mr} 份 × 每份 ${q.md}（順序顛倒了）`, correct:false});
+    opts.push({txt:`${q.md} ＋ ${q.mr}`, sub:`把兩個數加起來（用錯方法）`, correct:false});
+    if(opts.length<3) opts.push({txt:`${q.md} × ${q.mr+1}`, sub:`份數數錯了`, correct:false});
+    return shuffle(opts);
+  }
+
+  function buildConcept(q){
+    const opts=mulOptions(q);
+    answer.innerHTML=`<div class="concept">
+      <div class="ctitle">先列式 1️⃣：這題的乘法算式是哪一個？<br><span class="csmall">被乘數 × 乘數 ＝ 每份的量 × 份數</span></div>
+      <div class="opts" id="copts">
+        ${opts.map((o,i)=>`<button class="opt" data-i="${i}"><span class="ot">${o.txt}</span><span class="osub">${o.sub}</span></button>`).join('')}
+      </div></div>`;
+    $('#copts').querySelectorAll('.opt').forEach(b=>b.addEventListener('click',()=>{
+      if(state.conceptOK!==null) return;
+      const o=opts[+b.dataset.i];
+      $('#copts').querySelectorAll('.opt').forEach((btn,i)=>{ btn.disabled=true; if(opts[i].correct)btn.classList.add('correct'); });
+      if(o.correct){ state.conceptOK=true; }
+      else { b.classList.add('wrong'); state.conceptOK=false; if(state.mode==='quiz') state.conceptMiss++; }
+      afterConcept(q);
+    }));
+  }
+
+  function afterConcept(q){
+    const chip = state.conceptOK
+      ? `<div class="cchip ok">✓ 算式正確：${q.md} × ${q.mr}（被乘數 ${q.md}＝每份，乘數 ${q.mr}＝份數）</div>`
+      : `<div class="cchip no">✗ 要注意：正確算式是 ${q.md} × ${q.mr}，<b>被乘數（每份 ${q.md}）要放前面</b>。</div>`;
+    answer.insertAdjacentHTML('beforeend', chip);
+    const wrap=document.createElement('div'); answer.appendChild(wrap);
+    buildPad(q, wrap);
+    wrap.scrollIntoView({block:'nearest',behavior:'smooth'});
+  }
+
+  function buildPad(q, mount){
+    const host=mount||answer;
+    host.innerHTML=`<div class="answer">
+      ${q.mul?'<div class="padlabel">算出答案 2️⃣</div>':''}
+      <div class="display" id="disp"><span class="ph">輸入答案</span></div>
+      <div class="pad">
+        ${[1,2,3,4,5,6,7,8,9].map(n=>`<button class="key" data-k="${n}">${n}</button>`).join('')}
+        <button class="key fn" data-k="del">⌫</button>
+        <button class="key" data-k="0">0</button>
+        <button class="key ok" data-k="ok">確定</button>
+      </div></div>`;
+    host.querySelectorAll('.key').forEach(b=>b.addEventListener('click',()=>{
+      const k=b.dataset.k;
+      if(state.answered && k!=='ok') return;
+      if(k==='del') state.typed=state.typed.slice(0,-1);
+      else if(k==='ok'){ checkAns(q); return; }
+      else if(state.typed.length<4) state.typed+=k;
+      const d=$('#disp');
+      d.innerHTML = state.typed==='' ? '<span class="ph">輸入答案</span>' : state.typed+`<span class="u">${q.unit}</span>`;
+    }));
+  }
+
+  function checkAns(q){
+    if(state.typed===''){ nudge(); return; }
+    if(state.answered) return;
+    state.answered=true;
+    const ansOK=parseInt(state.typed,10)===q.ans;
+    const conceptOK = q.mul ? (state.conceptOK===true) : true;
+    if(ansOK && conceptOK){ good(); }
+    else{
+      badMsg(q, ansOK, conceptOK);
+      const entry={q, your:state.typed};
+      if(state.mode==='quiz') state.wrong.push(entry); else state.againWrong.push(entry);
+    }
+    revealAll();
+  }
+
+  // ----- two-step guide (with 被乘數/乘數) -----
+  function steps(q){
+    let one=`<span class="tag t1">第一步</span>${q.s1d}<br><span class="ex">${q.s1e} ＝ ${q.s1r}</span>`;
+    if(q.mul){
+      one+=`<div class="mulnote">`+
+        `<span class="mtag md">被乘數 ${q.md}</span>${q.mdMean}（每一份的量）<br>`+
+        `<span class="mtag mr">乘數 ${q.mr}</span>${q.mrMean}（有幾份）<br>`+
+        `被乘數 × 乘數 ＝ 每份的量 × 份數 ＝ <b>${q.s1r}</b>`+
+      `</div>`;
+    }
+    return [
+      {cls:'intro', html:`這題要算 <b>兩步</b>。先想清楚：先算什麼，再算什麼。`},
+      {cls:'one', html:one},
+      {cls:'two', html:`<span class="tag t2">第二步</span>${q.s2d}<br><span class="ex">${q.s2e} ＝ ${q.ans}</span>`},
+      {cls:'fin', html:`所以答案是 <span class="pk">${q.ans} ${q.unit}</span> ✅`}
+    ];
+  }
+  thinkBtn.addEventListener('click',()=>{
+    if(think.classList.contains('show')){ think.className='think'; thinkBtn.textContent='想一想 🔎（先算什麼？再算什麼？）'; return; }
+    showThink(false); thinkBtn.textContent='收起提示 ▲';
+  });
+  function showThink(all){
+    const q=state.list[state.idx].q; const st=steps(q);
+    think.innerHTML=st.map((s,i)=>`<div class="stepcard ${s.cls}${(all||i===0)?' on':''}">${s.html}</div>`).join('')
+      + (all?'':`<div class="nextstep"><button id="nextStep">下一步 ▸</button></div>`);
+    think.className='think show';
+    if(!all){
+      let k=0; const tot2=st.length; const nb=$('#nextStep');
+      nb.addEventListener('click',()=>{ k++; const cards=think.querySelectorAll('.stepcard');
+        if(k<tot2){cards[k].classList.add('on'); cards[k].scrollIntoView({block:'nearest',behavior:'smooth'});}
+        if(k>=tot2-1){nb.textContent='看完了！'; nb.disabled=true;} });
+    }
+  }
+  function revealAll(){ showThink(true); thinkBtn.style.display='none'; }
+
+  // ----- feedback -----
+  const PRAISE=['答對了！','太棒了！','兩步都對！','完全正確！','解題高手！'];
+  function good(){ state.score++; scoreEl.textContent=state.score;
+    fb.className='fb good show'; fb.innerHTML=`<span class="em">🎉</span> ${pick(PRAISE)}`; showNext(); }
+  function badMsg(q, ansOK, conceptOK){
+    fb.className='fb bad show';
+    let m;
+    if(!ansOK && !conceptOK) m=`正確答案是 ${q.ans} ${q.unit}；而且乘法算式要寫 ${q.md} × ${q.mr}（每份的量放前面）。`;
+    else if(!ansOK) m=`正確答案是 ${q.ans} ${q.unit}，看看下面的兩步驟！`;
+    else m=`答案算對了 👍 但乘法算式要注意：應該是 ${q.md} × ${q.mr}，被乘數（每份 ${q.md}）要放前面！`;
+    fb.innerHTML=`<span class="em">💡</span> ${m}`;
+    showNext();
+  }
+  function showNext(){ fill.style.width=((state.idx+1)/total()*100)+'%';
+    const last=state.idx>=total()-1;
+    nextQ.textContent = last ? (state.mode==='quiz'?'看成績 🏆':'看訂正結果 ✏️') : '下一題 ▸';
+    nextQ.className='nextq show'; nextQ.scrollIntoView({block:'nearest',behavior:'smooth'}); }
+  function nudge(){ thinkBtn.classList.remove('nudge'); void thinkBtn.offsetWidth; thinkBtn.classList.add('nudge'); }
+
+  nextQ.addEventListener('click',()=>{
+    if(state.idx>=total()-1){ state.mode==='quiz'?showResult():showReviewResult(); return; }
+    state.idx++; render(); $('#card').scrollIntoView({block:'start',behavior:'smooth'});
+  });
+
+  // ----- start a review pass over wrong questions -----
+  function startReview(wrongList){
+    state.mode='review'; state.list=wrongList.map(w=>({q:w.q, your:w.your}));
+    state.idx=0; state.score=0; scoreEl.textContent=0; state.againWrong=[];
+    banner.style.display='block';
+    banner.textContent=`✏️ 訂正模式：把錯的 ${state.list.length} 題再做一次`;
+    progLabel.textContent='訂正';
+    $('#card').scrollIntoView({block:'start',behavior:'smooth'});
+    render();
+  }
+
+  function showResult(){
+    const s=state.score, w=state.wrong.length;
+    let em='🎉',msg='';
+    if(s>=45){em='🏆';msg='太厲害了！兩步驟解題完全難不倒你！';}
+    else if(s>=38){em='🌟';msg='很棒！大部分的兩步驟題都解對了！';}
+    else if(s>=30){em='💪';msg='不錯喔！記得先想「先算什麼、再算什麼」。';}
+    else {em='🍀';msg='沒關係，多練幾次就會抓到拆解的訣竅！';}
+    let html=`<div class="result"><div class="em">${em}</div><h2>練習完成！</h2>
+      <div class="big">${s}<span> / 50</span></div><p>${msg}</p>`;
+    if(state.conceptMiss>0) html+=`<p style="color:var(--s2-d)">🔎 乘法算式答錯了 ${state.conceptMiss} 次，記得：被乘數 × 乘數 ＝ 每份的量 × 份數！</p>`;
+    if(w>0) html+=`<button class="fix" id="fix">✏️ 訂正錯的 ${w} 題</button>`;
+    html+=`<button class="alt" id="again">🔄 再玩 50 題</button></div>`;
+    $('#card').innerHTML=html;
+    if(w>0) $('#fix').addEventListener('click',()=>startReview(state.wrong));
+    $('#again').addEventListener('click',()=>location.reload());
+  }
+
+  function showReviewResult(){
+    const corrected=total()-state.againWrong.length;
+    const allDone=state.againWrong.length===0;
+    let html=`<div class="result"><div class="em">${allDone?'🌟':'💪'}</div>
+      <h2>訂正完成！</h2>
+      <div class="big">${corrected}<span> / ${total()}</span></div>
+      <p>${allDone?'全部訂正成功，太棒了！':`還有 ${state.againWrong.length} 題可以再訂正一次。`}</p>`;
+    if(!allDone) html+=`<button class="fix" id="re">✏️ 再訂正剩下的 ${state.againWrong.length} 題</button>`;
+    html+=`<button class="alt" id="again">🔄 再玩 50 題（新題目）</button></div>`;
+    $('#card').innerHTML=html;
+    if(!allDone) $('#re').addEventListener('click',()=>startReview(state.againWrong));
+    $('#again').addEventListener('click',()=>location.reload());
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>
